@@ -761,6 +761,12 @@ class runbot_build(osv.osv):
                                                   set(available_modules), explicit_modules)
             _logger.debug("modules_to_test for build %s: %s", build.dest, modules_to_test)
             build.write({'modules': ','.join(modules_to_test)})
+        # SC copy extra module cloned manually in custom dir of repo
+        path = additional_modules[0]
+        dir = path[0:path.rfind('/static')] + '/static/repo/custom'
+        for module in os.listdir(dir):
+            if not module.startswith('.') and os.path.isdir(os.path.join(dir, module)):
+                shutil.copytree(os.path.join(dir, module), os.path.join(build.server('addons'), module))
 
     def pg_dropdb(self, cr, uid, dbname):
         run(['dropdb', dbname])
